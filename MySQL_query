@@ -1,0 +1,67 @@
+Queries for online banking management system
+
+
+create database banking_management_systems;
+use banking_management_systems;
+
+CREATE TABLE Users(
+    userID INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    userType VARCHAR(20) NOT NULL,
+    age int
+);
+CREATE TABLE Employee (
+    empId INT PRIMARY KEY,
+    userId INT,
+    position VARCHAR(30),
+    isActive BOOLEAN,
+    salary DOUBLE,
+    FOREIGN KEY (userId) REFERENCES Users(userId)
+);
+
+
+CREATE TABLE Accounts (
+    accountId INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT,
+    accNumber VARCHAR(20) NOT NULL,
+    balance DECIMAL(10, 2) DEFAULT 0.0,
+    status boolean,
+    FOREIGN KEY (userID) REFERENCES Users(userID)
+)AUTO_INCREMENT = 1001;
+
+CREATE TABLE Transactions (
+    transId INT AUTO_INCREMENT PRIMARY KEY,
+	accountId INT,
+    transType VARCHAR(20) NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    sender VARCHAR(50),
+    receiver VARCHAR(50),
+    userId INT,
+	timestamp TIMESTAMP,
+    FOREIGN KEY (AccountID) REFERENCES Accounts(AccountID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+)AUTO_INCREMENT = 101;
+
+CREATE TABLE Loan (
+    loanId INT AUTO_INCREMENT PRIMARY KEY,
+    userId INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    amount DECIMAL(17, 2) NOT NULL,
+    interestRate DECIMAL(5, 2) NOT NULL,
+    isApproved BOOLEAN NOT NULL,
+    payed DECIMAL(17, 2) NOT NULL,
+    repaymentperiod TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES Users(userId)
+)AUTO_INCREMENT = 1;
+ALTER TABLE Loan
+MODIFY repaymentperiod varchar(50);
+
+
+select * from Employee;
+select * from accounts;
+select * from Users;
+select * from Transactions;
+select * from loan;
+
