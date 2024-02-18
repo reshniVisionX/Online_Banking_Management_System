@@ -26,7 +26,7 @@ public class AdminFunctionalities {
 		            double interestRate = rs.getDouble("interestRate");
 		            boolean isApproved = rs.getBoolean("isApproved");
 		            double payed = rs.getDouble("payed");
-		            java.sql.Timestamp repaymentperiod = rs.getTimestamp("repaymentperiod");
+		            String repaymentperiod = rs.getString("repaymentperiod");
 		            java.sql.Timestamp timestamp = rs.getTimestamp("timestamp");
 				System.out.println("Loan ID: " + loanId +
 		                   ", User ID: " + userId +
@@ -69,12 +69,10 @@ public class AdminFunctionalities {
 		
 	}
 
-	public void remove_an_emp(String name) {
-		String select = "SELECT * FROM users where username = ?";
-		String query = "Delete from users where userId= ?";
+	public void deactivate_an_emp(String name) {
+		String select = "SELECT * FROM users where username = ? AND userType = 'EMPLOYEE'";
 		String emp = "UPDATE EMPLOYEE SET isActive = false where userId = ? ";
 		try(PreparedStatement prep = con.prepareStatement(select);
-				PreparedStatement dlt = con.prepareStatement(query);
 				PreparedStatement empact = con.prepareStatement(emp)){
 			con.setAutoCommit(false);
 			boolean success = true;
@@ -82,14 +80,6 @@ public class AdminFunctionalities {
 			ResultSet rs = prep.executeQuery();
 			while(rs.next()) {
 				int userId = rs.getInt("userId");
-				dlt.setInt(1, userId);
-				int d = dlt.executeUpdate();
-				if(d>0) {
-					System.out.println("User "+name+" is deleted successfully");
-				}else {
-					success = false;
-					System.out.println("Error while deleting");
-				}
 				empact.setInt(1,userId );
 				int act = empact.executeUpdate();
 				if(act>0) {
@@ -214,6 +204,73 @@ public class AdminFunctionalities {
 		         
 			}
 			System.out.println("-----------------------------------------End of report-------------------------------------------");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void change_role_pass(String role,String pass) {
+		String select = "SELECT * FROM SETTING WHERE role=? AND isAlive = true";
+		String update = "UPDATE SETTING SET isAlive = false WHERE role = ?";
+		String insert = "INSERT INTO SETTING(role,role_pass,isAlive) VALUES(?,?,?)";
+		String update_user = "UPDATE USERS SET password = ? WHERE userType = ?";
+		try(PreparedStatement sprep=con.prepareStatement(select);
+				PreparedStatement uprep=con.prepareStatement(update);
+				PreparedStatement iprep=con.prepareStatement(insert);
+				PreparedStatement userprep = con.prepareStatement(update_user)){
+			sprep.setString(1, role.toUpperCase());
+			ResultSet rs = sprep.executeQuery();
+            con.setAutoCommit(false);
+            boolean success = true;
+			if(rs.next()) {
+				uprep.setString(1, role);
+				int res = uprep.executeUpdate();
+				if(res>0) {
+				iprep.setString(1, role);
+				iprep.setString(2, pass);
+				iprep.setBoolean(3, true);
+				int re = iprep.executeUpdate();
+				if(re>0 && success) {
+					System.out.println("Password updated successfully");
+					userprep.setString(1, pass);
+					userprep.setString(2, role);
+					int upd = userprep.executeUpdate();
+					if(upd>0 && success) {
+						System.out.println("Updated in users table");
+					}
+				}else {
+					success = false;
+					System.out.println("Error in inserting");
+					
+				}
+				}else {
+					System.out.println("Error in updating");
+					success = false;
+				}
+			}
+			if(success)
+				con.commit();
+			else
+				con.rollback();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	
+	}
+
+	public void update_password(String pass,String role) {
+		String update = "UPDATE USERS SET password = ? WHERE userType = ?";
+		try(PreparedStatement uprep = con.prepareStatement(update)){
+			uprep.setString(1,pass);
+			uprep.setString(2, role);
+			
+			int upd = uprep.executeUpdate();
+			if(upd>0) {
+				System.out.println("Updated in users table");
+			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

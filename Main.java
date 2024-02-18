@@ -15,8 +15,6 @@ public class Main {
 		int n = sc.nextInt();
 		sc.nextLine();
 		
-		
-
 		 if(n==1) {
 			int DEFAULT = 1;
 			System.out.println("Enter your Name: ");
