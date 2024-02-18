@@ -14,18 +14,32 @@ public class LogIn extends User {
     public static void login(String pass, String role) {
         Connection con = MySQLConnection.getConnection();
         String select = "SELECT * FROM Users WHERE password = ? AND userType = ?";
-        try (PreparedStatement prep = con.prepareStatement(select)) {
+        String apass = "SELECT * FROM SETTING WHERE role='ADMIN' AND isAlive=true";
+		String epass = "SELECT * FROM SETTING WHERE role='EMPLOYEE' AND isAlive=true";
+        try (PreparedStatement prep = con.prepareStatement(select);
+        		PreparedStatement aprep = con.prepareStatement(apass);
+				PreparedStatement eprep = con.prepareStatement(epass)){
+			ResultSet admin = aprep.executeQuery();
+			String emp_pass="",admin_pass="";
+			if(admin.next()) {
+				 admin_pass = admin.getString("role_pass");
+			}
+			ResultSet employee = eprep.executeQuery();
+			if(employee.next()) {
+				 emp_pass = employee.getString("role_pass");
+			}
             prep.setString(1, pass);
             prep.setString(2, role);
+            
             ResultSet rs = prep.executeQuery();
             if(rs.next()) {
-                String password = rs.getString("password");
-                String userRole = rs.getString("userType");
+             
+            	String userRole = rs.getString("userType");
                 String name = rs.getString("username");
                 int age = rs.getInt("age");
                 int userId = rs.getInt("userId");
                 if (userRole.equals("ADMIN")) {
-                    if (password.equals("admin123")) {
+                    if (pass.equals(admin_pass)) {
                         System.out.println("Welcome back admin "+name);
                         Admin adm = new Admin();
                         adm.showAdminMenu();
@@ -34,8 +48,8 @@ public class LogIn extends User {
                         return;
                     }
                 } else if (userRole.equals("EMPLOYEE")) {
-                    if (password.equals("employee@123")) {
-                        System.out.println("Welcome Employee "+name);
+                    if (pass.equals(emp_pass)) {
+                        System.out.println("Welcome Employee ");
                          Employees emp = new Employees();
                          emp.employeeMenuList();
                     } else {

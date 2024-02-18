@@ -12,7 +12,7 @@ public class Admin {
 			System.out.println("2. Deactivate an employee account*");
 			System.out.println("3. update the employee details*");
 			System.out.println("4. View all Employee details*");
-			System.out.println("5. Reset Password for employee");
+			System.out.println("5. Reset Password*");
 			System.out.println("6. Generate Transaction report*");
 			System.out.println("----------------------------------------------------------");
 			choice = sc.nextInt();
@@ -26,9 +26,14 @@ public class Admin {
 			  case 2:{
 				  //remove emp
 				    admin = new AdminFunctionalities();
-				    System.out.println("Enter the name of the employee : ");
-				    String name = sc.nextLine();
-					 admin.remove_an_emp(name);
+				    System.out.println("Do you want to update the name?(y/n):");
+					  char ch = sc.next().charAt(0);
+					if('N'!=Character.toUpperCase(ch)) {
+						sc.nextLine();
+				     System.out.println("Enter the name of the employee : ");
+				     String name = sc.nextLine();
+					 admin.deactivate_an_emp(name);
+					}
 					break;
 				 }
 			  case 3:{
@@ -37,6 +42,7 @@ public class Admin {
 				  String name = sc.next();
 				  System.out.println("Do you want to update the name?(y/n):");
 				  char ch = sc.next().charAt(0);
+				  sc.nextLine();
 				  String uname = name;
 				  if('N'!=Character.toUpperCase(ch)) {
 					  System.out.println("Enter the updated name : ");
@@ -60,13 +66,35 @@ public class Admin {
 					break;
 				 }
 			  case 5:{
-				  //will be updated
+				  //updating emp password
+				  System.out.println("Are you sure you want to change the password:(y/n)?");
+				  char ch = sc.next().charAt(0);
+				  sc.nextLine();
+				  if('n'!=Character.toLowerCase(ch)) {
+					  System.out.println("Do you want to change (ADMIN/EMPLOYEE) ?");
+					  String role=sc.nextLine().toUpperCase();
+					  if(role.equals("ADMIN") || role.equals("EMPLOYEE")) 
+					  {
+				      System.out.println("Enter the new password ?");
+				      String pass=sc.nextLine();
+				  admin = new AdminFunctionalities();
+				   admin.change_role_pass(role,pass);
+					
+						 
+				   
+				  }else {
+					  System.out.println("INVALID CREDENTIALS");
+					  return;
+				  }
+				  }
 					break;
 				 }
 			  case 6:{
 				  //generate transactional report
+				  
 				  admin = new AdminFunctionalities();
 					 admin.generateTransactionalReport();
+				  
 					break;
 				 }
 			 

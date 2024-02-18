@@ -59,6 +59,15 @@ ALTER TABLE Loan
 MODIFY repaymentperiod varchar(50);
 
 
+create table setting(
+    role varchar(15),
+    role_pass varchar(30),
+    isAlive boolean
+    );
+
+insert into setting(role,role_pass,isAlive) VALUES('admin','admin123',true);
+insert into setting(role,role_pass,isAlive) VALUES('employee','employee@123',true);
+
 select * from Employee;
 select * from accounts;
 select * from Users;

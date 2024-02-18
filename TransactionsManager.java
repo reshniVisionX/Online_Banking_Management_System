@@ -104,7 +104,7 @@ Connection con = MySQLConnection.getConnection();
 				System.out.println("Error in transfering..");
 			}
 			trans_rec_dest.setInt(1,rec_accid);
-			trans_rec_dest.setString(2, "RECEIVER");
+			trans_rec_dest.setString(2, "DEPOSIT");
 			trans_rec_dest.setDouble(3, amount);
 			trans_rec_dest.setString(4, dest);
 			trans_rec_dest.setString(5, src);
@@ -329,31 +329,6 @@ Connection con = MySQLConnection.getConnection();
 
 
 
-	public void applyLoan(int id, double amt,String type,String repay) {
-		String insert = "INSERT INTO LOAN (loanId,userId,type,amount,interestRate,isApproved,payed,repaymentperiod,Timestamp) VALUE(DEFAULT,?,?,?,?,?,?,?,?)";
-		try(PreparedStatement prep = con.prepareStatement(insert)){
-			 LocalDateTime timestamp = LocalDateTime.now();
-			prep.setInt(1, id);
-			prep.setString(2, type);
-			prep.setDouble(3, amt);
-			prep.setDouble(4,0.0);
-			prep.setBoolean(5, false);
-			prep.setDouble(6, 0.0);
-			prep.setString(7, repay);
-			prep.setObject(8, timestamp);
-			int rs = prep.executeUpdate();
-			if(rs>0) {
-				System.out.println("Loan is processing...");
-			}else {
-				System.out.println("Error while processing the loan");
-			}
-			
-		} catch (SQLException e) {
-			
-			e.printStackTrace();
-		}
-	}
-
 
 
 	public void withdrawATM(int id, double amount) {
@@ -373,25 +348,27 @@ Connection con = MySQLConnection.getConnection();
 				int uid = rs.getInt("userId");
 				int acc_id = rs.getInt("accountId");
 				String acc_num = rs.getString("accNumber");
-				if(balance<(balance+amount)) {
+				
+				if(balance<amount) {
 					success=false;
 					System.out.println("You dont have sufficient balance");
+					return;
 				}
-				prep.setDouble(1, balance+amount);
-				prep.setInt(2, id);
-			
+				prep.setDouble(1, balance-amount);
+				prep.setInt(2, uid);
+		     	System.out.println((balance-amount)+" "+uid);
 				int send = prep.executeUpdate();
 				
 				if(send>0 && success) {
 					 System.out.print(" withdraw successfully");}
 				else { 
 					success = false;
-				
+					
 					System.out.println("Error while updating");}
 				
 				//record - update
 				 LocalDateTime timestamp = LocalDateTime.now();
-		            tprep.setInt(1, id);
+		            tprep.setInt(1, acc_id);
 		            tprep.setString(2, "WITHDRAW");
 		            tprep.setDouble(3, amount);
 		            tprep.setString(4, "ATM");
@@ -419,7 +396,16 @@ Connection con = MySQLConnection.getConnection();
 			System.out.println("Error...!");
 			e.printStackTrace();
 		}
-		
+		 finally {
+	           
+	            try {
+	                if (con != null) {
+	                    con.close();
+	                }
+	            } catch (SQLException e) {
+	                System.out.println("Error closing connection: " + e.getMessage());
+	            }
+	        }
 	}
 
 	public void viewCustDetails() {

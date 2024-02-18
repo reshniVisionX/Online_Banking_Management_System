@@ -23,6 +23,7 @@ LoanProcessing  lp;
 			System.out.println("7. Approve Loan*");
 			System.out.println("8. View Customer Details*");
 			System.out.println("9. Generate Transaction Report*");
+			System.out.println("10. Refresh loan monthly emi*");
 			System.out.println("0. Exit");
 			System.out.println("-----------------------------------------------------------------");
 			
@@ -42,7 +43,7 @@ LoanProcessing  lp;
 			      String role = "CUSTOMER";
 			      
 			    	Connection con = MySQLConnection.getConnection();
-			  		String insert = "INSERT INTO USER(userId,userName,password,userType,age) VALUES(DEFAULT,?,?,?,?);";
+			  		String insert = "INSERT INTO USERS(userId,userName,password,userType,age) VALUES(DEFAULT,?,?,?,?);";
 			  		try(PreparedStatement prepstmt = con.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)){
 			  			 prepstmt.setString(1, name);
 			               prepstmt.setString(2, pass);
@@ -185,6 +186,7 @@ LoanProcessing  lp;
 					 lp=new LoanProcessing();
 					 lp.approveLoan();
 				 }
+				 break;
 			 }
 			 case 8:{
 				 //view cust details
@@ -198,7 +200,13 @@ LoanProcessing  lp;
 					 admin.generateTransactionalReport();
 				 break;
 			 }
+			 case 10:{
+				 lp=new LoanProcessing();
+				 lp.refreshLoan();
+			 }
 			}
 		}while(choice!=0);
 	}
 }
+
+
